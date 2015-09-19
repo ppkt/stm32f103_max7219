@@ -6,44 +6,42 @@
 
 #include "common_lib/spi.h"
 
+#include "device_lib/max7219.h"
+
 int main(void)
 {
     LED_Init1();
-    spi_init(SPI1, true);
-    unsigned j = 0;
+    setup_delay_timer(TIM2);
 
-    u8 tx[2], rx[2];
+    max7219_init();
+    max7219_self_test();
+    max7219_clear_display();
 
-//    tx[0] = 0x09;
-//    tx[1] = 0xFF;
-//    spi_send(SPI1, tx, rx, 2);
-
-    tx[0] = 0x09;
-    tx[1] = 0x01;
-    GPIO_WriteBit(GPIOA, GPIO_Pin_4, Bit_RESET);
-    spi_send(SPI1, tx, rx, 2);
-    GPIO_WriteBit(GPIOA, GPIO_Pin_4, Bit_SET);
-
-    tx[0] = 0x0A;
-    tx[1] = 0x00;
-    GPIO_WriteBit(GPIOA, GPIO_Pin_4, Bit_RESET);
-    spi_send(SPI1, tx, rx, 2);
-    GPIO_WriteBit(GPIOA, GPIO_Pin_4, Bit_SET);
+    max7219_set_led(1, 1);
+    max7219_set_led(0, 1);
+    max7219_set_led(1, 0);
 
 
+    max7219_reset_led(1, 1);
+    max7219_clear_display();
+
+    uint8_t data[8] = {
+        0b00000000,
+        0b01100110,
+        0b01100110,
+        0b00000000,
+        0b10000001,
+        0b01000010,
+        0b00111100,
+        0b00000000
+    };
+
+    max7219_set_data(data);
 
     while(1) {
-        GPIO_WriteBit(GPIOA, GPIO_Pin_4, Bit_RESET);
-
-//        tx[0] = 0x09;
-//        tx[1] = 0xFF;
-//        spi_send(SPI1, tx, rx, 2);
-        GPIO_WriteBit(GPIOA, GPIO_Pin_4, Bit_SET);
-
-        for (j = 0; j < 200000; ++j) {}
+        delay_ms(TIM2, 10);
         GPIO_WriteBit(GPIOC, GPIO_Pin_13, Bit_SET);
-        for (j = 0; j < 200000; ++j) {}
+        delay_ms(TIM2, 100);
         GPIO_WriteBit(GPIOC, GPIO_Pin_13, Bit_RESET);
-
     }
 }

@@ -19,6 +19,8 @@ SET(PROJECT_SOURCES
     common_lib/usart.c
     common_lib/usart.h
 
+    device_lib/max7219.c
+
     main.c
 )
 
